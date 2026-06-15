@@ -164,7 +164,7 @@ function Invoke-SmartChat {
     if ($danger_mode) {
         Write-Host "║  ⚠️ DANGER MODE: Tự động xác thực quyền  ║" -ForegroundColor Green
     } else {
-        Write-Host "║  🔒 SAFE MODE: Yêu cầu xác thực quyền    ║" -ForegroundColor Green
+        Write-Host "║  🔒 SAFE MODE: Sẽ hiện popup hỏi quyền   ║" -ForegroundColor Green
     }
     Write-Host "║  Gõ 'exit' hoặc Ctrl+C để thoát         ║" -ForegroundColor Green
     Write-Host "╚══════════════════════════════════════════╝" -ForegroundColor Green
@@ -199,7 +199,7 @@ function Invoke-SmartChat {
                     claude --model $model --dangerously-skip-permissions --continue $inputVal
                 }
             } else {
-                Write-Host "🔧 Tool Mode (SAFE) — gõ /exit sau khi xong" -ForegroundColor DarkGray
+                Write-Host "🔧 Đang chạy tương tác (Sẽ hiện popup hỏi quyền - Hãy gõ /exit sau khi xong)" -ForegroundColor DarkGray
                 if ($first_msg) {
                     claude --model $model $inputVal
                     $first_msg = $false

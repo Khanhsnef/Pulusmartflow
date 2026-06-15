@@ -137,7 +137,7 @@ smart_chat() {
     if [[ "$danger_mode" == true ]]; then
         echo "║  ⚠️ DANGER MODE: Tự động xác thực quyền  ║"
     else
-        echo "║  🔒 SAFE MODE: Yêu cầu xác thực quyền    ║"
+        echo "║  🔒 SAFE MODE: Sẽ hiện popup hỏi quyền   ║"
     fi
     echo "║  Gõ 'exit' hoặc Ctrl+C để thoát         ║"
     echo "╚══════════════════════════════════════════╝"
@@ -168,7 +168,7 @@ smart_chat() {
                     claude --model "$model" --dangerously-skip-permissions --continue "$input"
                 fi
             else
-                echo -e "\033[2m🔧 Đang bật giao diện Công Cụ (An toàn - Hãy gõ /exit sau khi xong)\033[0m"
+                echo -e "\033[2m🔧 Đang chạy tương tác (Sẽ hiện popup hỏi quyền - Hãy gõ /exit sau khi xong)\033[0m"
                 if [[ "$first_msg" == true ]]; then
                     claude --model "$model" "$input"
                     first_msg=false
