@@ -189,6 +189,12 @@ Hệ thống có **10 lớp tối ưu** để giảm thiểu chi phí:
 9. **Compact Mechanism** — Nén context khi >150K tokens
 10. **Two-Stage Classifier** — Chỉ dùng model lớn khi thực sự cần
 
+### ⚙️ Cách Áp Dụng Tự Động
+Khi bạn chạy script cài đặt `./scripts/install.sh`, hệ thống sẽ tự động gọi Python script để trộn (merge) các cấu hình tối ưu này từ `templates/claude.json` vào cấu hình Claude Code của bạn tại `~/.claude.json`.
+
+### ✍️ Cấu Hình Thủ Công
+Nếu muốn cấu hình thủ công, bạn có thể tham khảo file mẫu [templates/claude.json](file:///Users/ts-1148/Desktop/Pulusmartflow/templates/claude.json) và sao chép các khóa tương ứng vào `~/.claude.json` của mình.
+
 ---
 
 ## 🤖 Sub-Agents

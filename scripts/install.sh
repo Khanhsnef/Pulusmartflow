@@ -17,7 +17,7 @@ echo "╚═══════════════════════�
 echo -e "${NC}"
 
 # ─── Bước 1: Kiểm tra Python và httpx ───
-echo -e "${YELLOW}[1/5] Kiểm tra Python...${NC}"
+echo -e "${YELLOW}[1/6] Kiểm tra Python...${NC}"
 if ! command -v python3 &>/dev/null; then
     echo -e "${RED}❌ Python3 chưa cài. Cài tại: https://www.python.org${NC}"
     exit 1
@@ -29,7 +29,7 @@ python3 -c "import httpx" 2>/dev/null || {
 echo -e "${GREEN}✅ Python OK${NC}"
 
 # ─── Bước 2: Copy ai-classify.py ───
-echo -e "${YELLOW}[2/5] Cài AI Classifier...${NC}"
+echo -e "${YELLOW}[2/6] Cài AI Classifier...${NC}"
 mkdir -p ~/.local/bin
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cp "$SCRIPT_DIR/ai-classify.py" ~/.local/bin/ai-classify.py
@@ -37,7 +37,7 @@ chmod +x ~/.local/bin/ai-classify.py
 echo -e "${GREEN}✅ ai-classify.py → ~/.local/bin/${NC}"
 
 # ─── Bước 3: Thêm Smart Router vào ~/.zshrc ───
-echo -e "${YELLOW}[3/5] Cài Smart Router vào ~/.zshrc...${NC}"
+echo -e "${YELLOW}[3/6] Cài Smart Router vào ~/.zshrc...${NC}"
 if grep -q "SMART AI ROUTER" ~/.zshrc 2>/dev/null; then
     echo -e "${YELLOW}   ⚠️  Smart Router đã tồn tại. Bỏ qua để tránh trùng lặp.${NC}"
 else
@@ -46,7 +46,7 @@ else
 fi
 
 # ─── Bước 4: Tạo cấu trúc workspace ───
-echo -e "${YELLOW}[4/5] Tạo cấu trúc workspace...${NC}"
+echo -e "${YELLOW}[4/6] Tạo cấu trúc workspace...${NC}"
 WORKSPACE="${HOME}/Desktop/SmartFlowWorkspace"
 mkdir -p "$WORKSPACE/.claude/agents"
 mkdir -p "$WORKSPACE/output"
@@ -58,7 +58,12 @@ cp "$SCRIPT_DIR/templates/AGENTS.md" "$WORKSPACE/AGENTS.md" 2>/dev/null || true
 
 echo -e "${GREEN}✅ Workspace tạo tại: ${WORKSPACE}${NC}"
 
-# ─── Bước 5: Hướng dẫn tiếp theo ───
+# ─── Bước 5: Cấu hình tối ưu Token & MCP ───
+echo -e "${YELLOW}[5/6] Tối ưu hóa cấu hình Claude Code (Token limits, Prompt cache, MCPs)...${NC}"
+python3 "$SCRIPT_DIR/scripts/optimize_claude_config.py"
+echo -e "${GREEN}✅ Claude Code Config OK${NC}"
+
+# ─── Bước 6: Hướng dẫn tiếp theo ───
 echo ""
 echo -e "${CYAN}╔═══════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}║  ✅ Cài đặt hoàn tất!                            ║${NC}"

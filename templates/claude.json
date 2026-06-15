@@ -1,0 +1,61 @@
+{
+  "theme": "dark-daltonized",
+  "autoUpdates": false,
+  "tengu_swann_brevity": "focused",
+  "tengu_amber_wren": {
+    "targetedRangeNudge": true,
+    "maxTokens": 25000
+  },
+  "tengu_auto_mode_config": {
+    "enabled": "enabled",
+    "twoStageClassifier": true
+  },
+  "tengu_sm_config": {
+    "minimumMessageTokensToInit": 150000,
+    "minimumTokensBetweenUpdate": 40000,
+    "toolCallsBetweenUpdates": 10
+  },
+  "tengu_prompt_cache_1h_config": {
+    "allowlist": [
+      "repl_main_thread*",
+      "sdk",
+      "auto_mode",
+      "rolling_compact",
+      "memdir_relevance",
+      "agent_classifier",
+      "prompt_suggestion",
+      "away_summary",
+      "extract_memories",
+      "compact"
+    ]
+  },
+  "tengu_pewter_kestrel": {
+    "global": 50000,
+    "Bash": 30000,
+    "PowerShell": 30000,
+    "Grep": 20000,
+    "Snip": 1000,
+    "StrReplaceBasedEditTool": 30000,
+    "BashSearchTool": 20000
+  },
+  "mcpServers": {
+    "agentmemory": {
+      "command": "agentmemory-mcp-wrapper",
+      "args": [],
+      "env": {
+        "AGENTMEMORY_URL": "http://localhost:3111",
+        "AGENTMEMORY_SECRET": "",
+        "AGENTMEMORY_TOOLS": "all"
+      }
+    },
+    "headroom": {
+      "type": "stdio",
+      "command": "headroom",
+      "args": [
+        "mcp",
+        "serve"
+      ],
+      "env": {}
+    }
+  }
+}
