@@ -1,0 +1,102 @@
+# PuluSmartFlow — Installer for Windows PowerShell
+# Run: Set-ExecutionPolicy Bypass -Scope Process; .\scripts\install.ps1
+
+Write-Host "╔═══════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║  🤖 PuluSmartFlow — Windows Installer ║" -ForegroundColor Cyan
+Write-Host "╚═══════════════════════════════════════╝`n" -ForegroundColor Cyan
+
+# ─── Bước 1: Kiểm tra Python và httpx ───
+Write-Host "[1/6] Kiểm tra Python..." -ForegroundColor Yellow
+$pythonCheck = Get-Command python -ErrorAction SilentlyContinue
+if (-not $pythonCheck) {
+    Write-Host "❌ Không tìm thấy Python! Vui lòng cài đặt Python và tích hợp vào PATH." -ForegroundColor Red
+    Exit
+}
+
+try {
+    & python -c "import httpx" 2>$null
+} catch {
+    Write-Host "   Đang cài httpx..." -ForegroundColor Yellow
+    & pip install httpx --quiet
+}
+Write-Host "✅ Python OK" -ForegroundColor Green
+
+# ─── Bước 2: Cài AI Classifier ───
+Write-Host "[2/6] Cài AI Classifier..." -ForegroundColor Yellow
+$localBin = "$HOME\.local\bin"
+if (-not (Test-Path $localBin)) {
+    New-Item -Path $localBin -ItemType Directory -Force | Out-Null
+}
+
+$scriptDir = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+$scriptDir = Split-Path -Path $scriptDir -Parent # Get root dir
+
+Copy-Item -Path "$scriptDir\ai-classify.py" -Destination "$localBin\ai-classify.py" -Force
+Write-Host "✅ ai-classify.py → $localBin\" -ForegroundColor Green
+
+# ─── Bước 3: Thêm Smart Router vào PowerShell Profile ───
+Write-Host "[3/6] Cài Smart Router vào PowerShell Profile..." -ForegroundColor Yellow
+
+$profilePath = $PROFILE
+$profileDir = Split-Path -Path $profilePath -Parent
+if (-not (Test-Path $profileDir)) {
+    New-Item -Path $profileDir -ItemType Directory -Force | Out-Null
+}
+if (-not (Test-Path $profilePath)) {
+    New-Item -Path $profilePath -ItemType File -Force | Out-Null
+}
+
+$snippet = Get-Content -Path "$scriptDir\templates\powershell-profile.ps1" -Raw
+$currentProfile = Get-Content -Path $profilePath -Raw
+
+if ($currentProfile -match "SMART AI ROUTER") {
+    Write-Host "   ⚠️  Smart Router đã tồn tại trong Profile. Bỏ qua để tránh trùng lặp." -ForegroundColor Yellow
+} else {
+    # Backup profile first
+    if (Test-Path $profilePath) {
+        Copy-Item -Path $profilePath -Destination "$profilePath.bak" -Force
+        Write-Host "   💾 Đã sao lưu Profile tại: $profilePath.bak" -ForegroundColor Gray
+    }
+    Add-Content -Path $profilePath -Value "`n$snippet"
+    Write-Host "✅ Smart Router đã thêm vào PowerShell Profile ($profilePath)" -ForegroundColor Green
+}
+
+# ─── Bước 4: Tạo cấu trúc workspace ───
+Write-Host "[4/6] Tạo cấu trúc workspace..." -ForegroundColor Yellow
+$workspace = "$HOME\Desktop\SmartFlowWorkspace"
+$agentDir = "$workspace\.claude\agents"
+$outDir = "$workspace\output"
+
+if (-not (Test-Path $agentDir)) { New-Item -Path $agentDir -ItemType Directory -Force | Out-Null }
+if (-not (Test-Path $outDir)) { New-Item -Path $outDir -ItemType Directory -Force | Out-Null }
+
+# Copy agent templates
+Copy-Item -Path "$scriptDir\agents\*" -Destination $agentDir -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$scriptDir\templates\CLAUDE.md" -Destination "$workspace\CLAUDE.md" -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$scriptDir\templates\AGENTS.md" -Destination "$workspace\AGENTS.md" -Force -ErrorAction SilentlyContinue
+
+Write-Host "✅ Workspace tạo tại: $workspace" -ForegroundColor Green
+
+# ─── Bước 5: Cấu hình tối ưu Token & MCP ───
+Write-Host "[5/6] Tối ưu hóa cấu hình Claude Code (Token limits, Prompt cache, MCPs)..." -ForegroundColor Yellow
+& python "$scriptDir\scripts\optimize_claude_config.py"
+Write-Host "✅ Claude Code Config OK" -ForegroundColor Green
+
+# ─── Bước 6: Hướng dẫn tiếp theo ───
+Write-Host ""
+Write-Host "╔═══════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║  ✅ Cài đặt hoàn tất!                            ║" -ForegroundColor Cyan
+Write-Host "╠═══════════════════════════════════════════════════╣" -ForegroundColor Cyan
+Write-Host "║  📌 Bước cuối cần làm thủ công:                  ║" -ForegroundColor Cyan
+Write-Host "║                                                   ║" -ForegroundColor Cyan
+Write-Host "║  1. Chỉnh API Key trong File Profile của bạn:     ║" -ForegroundColor Cyan
+Write-Host "║     Gõ lệnh: notepad `$PROFILE                    ║" -ForegroundColor Cyan
+Write-Host "║     Đặt biến: `$env:ANTHROPIC_API_KEY = `"key`"     ║" -ForegroundColor Cyan
+Write-Host "║                                                   ║" -ForegroundColor Cyan
+Write-Host "║  2. Reload shell:                                 ║" -ForegroundColor Cyan
+Write-Host "║     Tắt đi bật lại Terminal hoặc chạy:            ║" -ForegroundColor Cyan
+Write-Host "║     . `$PROFILE                                   ║" -ForegroundColor Cyan
+Write-Host "║                                                   ║" -ForegroundColor Cyan
+Write-Host "║  3. Bắt đầu dùng:                                ║" -ForegroundColor Cyan
+Write-Host "║     chat                                         ║" -ForegroundColor Cyan
+Write-Host "╚═══════════════════════════════════════════════════╝" -ForegroundColor Cyan

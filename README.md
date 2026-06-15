@@ -63,43 +63,67 @@ Câu hỏi của bạn
 
 ### Yêu Cầu
 
-- macOS / Linux (zsh hoặc bash)
-- Python 3.8+ với `httpx`: `pip3 install httpx`
+- **macOS / Linux**: `zsh` hoặc `bash`
+- **Windows**: `PowerShell 3.0+`
+- Python 3.8+ với `httpx`: `pip install httpx`
 - [Claude Code CLI](https://docs.anthropic.com/claude-code)
 - [9Router](https://9router.dev) — Local LLM gateway (cần API key)
 
-### Bước 1: Clone repo
+### Clone repo
 
 ```bash
 git clone https://github.com/khanhsnef/Pulusmartflow.git
 cd Pulusmartflow
 ```
 
-### Bước 2: Chạy script cài đặt
+### Chạy script cài đặt
 
+#### 🍎 Môi trường macOS / Linux (zsh/bash):
 ```bash
 chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-Script sẽ tự động:
-- Copy `ai-classify.py` vào `~/.local/bin/`
-- Thêm Smart Router vào `~/.zshrc`
-- Tạo thư mục workspace với cấu trúc chuẩn
-
-### Bước 3: Cấu hình API Key
-
-Thêm vào `~/.zshrc` (hoặc chỉnh sửa trong file nếu script đã tạo):
-
-```bash
-export ANTHROPIC_BASE_URL="http://127.0.0.1:8787/v1"   # 9Router
-export ANTHROPIC_API_KEY="your-9router-api-key-here"
+#### 🪟 Môi trường Windows (PowerShell):
+Mở PowerShell và chạy lệnh sau để thiết lập quyền thực thi và chạy installer:
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process
+.\scripts\install.ps1
 ```
 
-### Bước 4: Reload và test
+Kịch bản cài đặt sẽ tự động:
+- Cài đặt AI Classifier (`ai-classify.py`) vào thư mục bin cục bộ.
+- Thêm cấu hình Smart Router tự động định tuyến vào file shell profile (`~/.zshrc` hoặc `$PROFILE`).
+- Tự động trộn (merge) các cấu hình tối ưu token từ mẫu `templates/claude.json` vào file cấu hình Claude Code (`~/.claude.json`).
+- Tạo cấu trúc thư mục workspace mẫu.
 
+### Cấu hình API Key & Khởi động
+
+#### 🍎 macOS / Linux:
+Chỉnh sửa cấu hình API Key trong `~/.zshrc`:
+```bash
+export ANTHROPIC_BASE_URL="http://127.0.0.1:8787/v1"   # 9Router local
+export ANTHROPIC_API_KEY="your-9router-api-key-here"
+```
+Chạy lệnh reload shell và bắt đầu dùng:
 ```bash
 source ~/.zshrc
+chat  # Bắt đầu sử dụng!
+```
+
+#### 🪟 Windows (PowerShell):
+Mở file Profile bằng Notepad:
+```powershell
+notepad $PROFILE
+```
+Chỉnh sửa dòng cấu hình API Key:
+```powershell
+$env:ANTHROPIC_BASE_URL = "http://127.0.0.1:8787/v1"
+$env:ANTHROPIC_API_KEY = "your-9router-api-key-here"
+```
+Reload profile và bắt đầu dùng:
+```powershell
+. $PROFILE
 chat  # Bắt đầu sử dụng!
 ```
 
@@ -152,8 +176,10 @@ Gõ thẳng câu hỏi vào terminal (không phải lệnh hệ thống) → AI 
 Pulusmartflow/
 ├── README.md                    # Tài liệu này
 ├── scripts/
-│   ├── install.sh               # Script cài đặt tự động
-│   └── setup_smart_router.sh    # Chỉ setup Smart Router
+│   ├── install.sh               # Script cài đặt cho macOS/Linux (Bash)
+│   ├── install.ps1              # Script cài đặt cho Windows (PowerShell)
+│   ├── setup_smart_router.sh    # Chỉ setup Smart Router (Bash)
+│   └── optimize_claude_config.py # Python script trộn cấu hình tối ưu token
 ├── agents/                      # 9 Sub-agent templates
 │   ├── sql-analyst.md
 │   ├── report-writer.md
@@ -166,9 +192,11 @@ Pulusmartflow/
 │   └── weekly-review.md
 ├── templates/
 │   ├── CLAUDE.md                # Template context công việc
-│   └── AGENTS.md                # Template system prompt
+│   ├── AGENTS.md                # Template system prompt
+│   ├── claude.json              # Template cấu hình Claude Code tối ưu token
+│   └── powershell-profile.ps1   # Template Smart Router cho Windows
 ├── ai-classify.py               # AI Intent Classifier (Python)
-└── zshrc-snippet.sh             # Phần thêm vào ~/.zshrc
+└── zshrc-snippet.sh             # Phần thêm vào ~/.zshrc cho macOS/Linux
 ```
 
 ---
