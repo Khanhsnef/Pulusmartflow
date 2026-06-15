@@ -88,8 +88,17 @@ if ($currentProfile -match "SMART AI ROUTER") {
     Write-Host ""
     $userKey = Read-Host "🔑 Nhập API Key 9Router của bạn (nhấn Enter để bỏ qua và tự điền sau)"
     if ($userKey) {
-        $snippet = $snippet.Replace("your-9router-api-key-here", $userKey)
-        Write-Host "   Đã cấu hình API Key vào Profile." -ForegroundColor Green
+        $configDir = "$HOME\.config\pulu"
+        if (-not (Test-Path $configDir)) {
+            New-Item -Path $configDir -ItemType Directory -Force | Out-Null
+        }
+        $envContent = @"
+# Configuration env for 9Router and PuluSmartFlow
+export ANTHROPIC_BASE_URL="http://127.0.0.1:8787/v1"
+export ANTHROPIC_API_KEY="$userKey"
+"@
+        Set-Content -Path "$configDir\env" -Value $envContent
+        Write-Host "   ✅ Đã cấu hình và lưu API Key bảo mật tại $configDir\env" -ForegroundColor Green
     }
     
     Add-Content -Path $profilePath -Value "`n$snippet"

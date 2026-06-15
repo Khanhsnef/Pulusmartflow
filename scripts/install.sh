@@ -75,15 +75,18 @@ else
     read -r user_key
     
     if [ -n "$user_key" ]; then
-        temp_snippet="/tmp/zshrc-snippet-temp.sh"
-        sed "s/your-9router-api-key-here/$user_key/g" "$SCRIPT_DIR/zshrc-snippet.sh" > "$temp_snippet"
-        cat "$temp_snippet" >> ~/.zshrc
-        rm -f "$temp_snippet"
-        echo -e "${GREEN}✅ Smart Router (đã cấu hình API Key) đã thêm vào ~/.zshrc${NC}"
-    else
-        cat "$SCRIPT_DIR/zshrc-snippet.sh" >> ~/.zshrc
-        echo -e "${GREEN}✅ Smart Router (chưa cấu hình API Key) đã thêm vào ~/.zshrc${NC}"
+        mkdir -p ~/.config/pulu
+        cat > ~/.config/pulu/env << ENVEOF
+# Configuration env for 9Router and PuluSmartFlow
+export ANTHROPIC_BASE_URL="http://127.0.0.1:8787/v1"
+export ANTHROPIC_API_KEY="$user_key"
+ENVEOF
+        chmod 600 ~/.config/pulu/env
+        echo -e "${GREEN}   ✅ Đã cấu hình và lưu API Key bảo mật tại ~/.config/pulu/env${NC}"
     fi
+    
+    cat "$SCRIPT_DIR/zshrc-snippet.sh" >> ~/.zshrc
+    echo -e "${GREEN}✅ Smart Router đã thêm vào ~/.zshrc${NC}"
 fi
 
 # ─── Bước 4: Tạo cấu trúc workspace ───
