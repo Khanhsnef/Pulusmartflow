@@ -191,10 +191,30 @@ alias chat="smart_chat"
 alias start="smart_chat"
 alias "chat!"="smart_chat !"
 
+# --- Kiểm tra một binary có thật không (kể cả khi không nằm trong $PATH) ---
+_pulu_is_real_cmd() {
+    local cmd="$1"
+    command -v "$cmd" &>/dev/null && return 0
+    local d
+    for d in "$HOME/.local/bin" /opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin; do
+        [[ -x "$d/$cmd" ]] && return 0
+    done
+    return 1
+}
+
 # --- Command Not Found → Auto-route to AI ---
 export _PULU_CNF_DEPTH=0
 command_not_found_handler() {
     local input="$*"
+    local cmd="$1"
+
+    # Nếu token đầu là lệnh THẬT (chỉ thiếu trong PATH) → đây là lỗi PATH, không route sang AI
+    if _pulu_is_real_cmd "$cmd"; then
+        echo -e "\n❌ \033[1;31m'$cmd'\033[0m tồn tại nhưng không nằm trong \$PATH."
+        echo -e "   Thử: \033[36mexport PATH=\"\$HOME/.local/bin:\$PATH\"\033[0m hoặc gọi bằng đường dẫn đầy đủ."
+        return 127
+    fi
+
     if [[ $_PULU_CNF_DEPTH -ge 1 ]]; then
         echo -e "\n❌ \033[1;31m[Pulu Circuit Breaker]\033[0m Phát hiện đệ quy lặp lệnh. Hủy thực thi."
         return 127
