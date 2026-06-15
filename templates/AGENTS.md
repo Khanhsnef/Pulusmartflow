@@ -49,4 +49,3 @@ Claude tự chọn agent phù hợp theo task — không cần gọi thủ công
 | `event-planner.md` | Event Planner | Lên kế hoạch sự kiện |
 | `meeting-prep.md` | Meeting Prep | Chuẩn bị cuộc họp |
 | `weekly-review.md` | Weekly Review | Review cuối tuần |
-| `home-design.md` | Home Design | Thiết kế nội thất |

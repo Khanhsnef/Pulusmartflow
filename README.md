@@ -20,7 +20,7 @@
 |:----------|:------|
 | 🧠 **Smart Router v3** | AI phân loại ý định (Haiku/Flash) + Regex fallback → chọn model tự động |
 | 💰 **Tối ưu token tự động** | Prompt cache, budget control, route miễn phí cho câu hỏi nhanh |
-| 🤖 **10 Sub-Agents chuyên biệt** | SQL Analyst, Report Writer, Driver Comms, Event Planner... |
+| 🤖 **9 Sub-Agents chuyên biệt** | SQL Analyst, Report Writer, Driver Comms, Event Planner... |
 | 🔄 **Hybrid Mode** | Tự chuyển Tool Mode khi cần tạo file/chạy script |
 | 💾 **Auto-backup** | Git push + Google Drive sync sau mỗi phiên |
 
@@ -154,7 +154,7 @@ Pulusmartflow/
 ├── scripts/
 │   ├── install.sh               # Script cài đặt tự động
 │   └── setup_smart_router.sh    # Chỉ setup Smart Router
-├── agents/                      # 10 Sub-agent templates
+├── agents/                      # 9 Sub-agent templates
 │   ├── sql-analyst.md
 │   ├── report-writer.md
 │   ├── competitive-intel.md
@@ -163,8 +163,7 @@ Pulusmartflow/
 │   ├── content-writer.md
 │   ├── event-planner.md
 │   ├── meeting-prep.md
-│   ├── weekly-review.md
-│   └── home-design.md
+│   └── weekly-review.md
 ├── templates/
 │   ├── CLAUDE.md                # Template context công việc
 │   └── AGENTS.md                # Template system prompt
@@ -212,7 +211,6 @@ Nếu muốn cấu hình thủ công, bạn có thể tham khảo file mẫu [te
 | `event-planner.md` | Lên kế hoạch sự kiện |
 | `meeting-prep.md` | Chuẩn bị trước cuộc họp |
 | `weekly-review.md` | Review cuối tuần |
-| `home-design.md` | Tư vấn thiết kế nội thất |
 
 ---
 
