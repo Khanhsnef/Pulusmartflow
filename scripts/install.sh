@@ -66,9 +66,17 @@ cp "$SCRIPT_DIR/ai-classify.py" ~/.local/bin/ai-classify.py
 chmod +x ~/.local/bin/ai-classify.py
 echo -e "${GREEN}✅ ai-classify.py → ~/.local/bin/${NC}"
 
-# ─── Bước 3: Thêm Smart Router vào ~/.zshrc ───
-echo -e "${YELLOW}[3/6] Cài Smart Router vào ~/.zshrc...${NC}"
-if grep -q "SMART AI ROUTER" ~/.zshrc 2>/dev/null; then
+# ─── Bước 3: Thêm Smart Router vào shell profile ───
+# Tự phát hiện shell đang dùng để ghi đúng file profile (zsh/bash)
+case "$(basename "${SHELL:-/bin/zsh}")" in
+    bash) PROFILE_FILE="$HOME/.bashrc" ;;
+    zsh)  PROFILE_FILE="$HOME/.zshrc" ;;
+    *)    PROFILE_FILE="$HOME/.zshrc" ;;  # mặc định zsh
+esac
+touch "$PROFILE_FILE"
+
+echo -e "${YELLOW}[3/6] Cài Smart Router vào ${PROFILE_FILE}...${NC}"
+if grep -q "SMART AI ROUTER" "$PROFILE_FILE" 2>/dev/null; then
     echo -e "${YELLOW}   ⚠️  Smart Router đã tồn tại. Bỏ qua để tránh trùng lặp.${NC}"
 else
     echo -e "${CYAN}🔑 Nhập API Key 9Router của bạn (nhấn Enter để bỏ qua và tự điền sau):${NC}"
@@ -85,13 +93,26 @@ ENVEOF
         echo -e "${GREEN}   ✅ Đã cấu hình và lưu API Key bảo mật tại ~/.config/pulu/env${NC}"
     fi
     
-    cat "$SCRIPT_DIR/zshrc-snippet.sh" >> ~/.zshrc
-    echo -e "${GREEN}✅ Smart Router đã thêm vào ~/.zshrc${NC}"
+    cat "$SCRIPT_DIR/zshrc-snippet.sh" >> "$PROFILE_FILE"
+    echo -e "${GREEN}✅ Smart Router đã thêm vào ${PROFILE_FILE}${NC}"
+fi
+
+# Đảm bảo ~/.local/bin nằm trong PATH (nơi chứa ai-classify.py)
+if ! echo "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then
+    if ! grep -q 'HOME/.local/bin' "$PROFILE_FILE" 2>/dev/null; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$PROFILE_FILE"
+        echo -e "${GREEN}   ✅ Đã thêm ~/.local/bin vào PATH${NC}"
+    fi
 fi
 
 # ─── Bước 4: Tạo cấu trúc workspace ───
 echo -e "${YELLOW}[4/6] Tạo cấu trúc workspace...${NC}"
-WORKSPACE="${HOME}/Desktop/SmartFlowWorkspace"
+# Dùng Desktop nếu tồn tại, ngược lại fallback về $HOME (server headless không có Desktop)
+if [ -d "${HOME}/Desktop" ]; then
+    WORKSPACE="${HOME}/Desktop/SmartFlowWorkspace"
+else
+    WORKSPACE="${HOME}/SmartFlowWorkspace"
+fi
 mkdir -p "$WORKSPACE/.claude/agents"
 mkdir -p "$WORKSPACE/output"
 
@@ -123,7 +144,7 @@ echo -e "${CYAN}║  1. Chỉnh API Key trong ~/.config/pulu/env:       ║${NC}
 echo -e "${CYAN}║     export ANTHROPIC_API_KEY=your-9router-key     ║${NC}"
 echo -e "${CYAN}║                                                   ║${NC}"
 echo -e "${CYAN}║  2. Reload shell:                                 ║${NC}"
-echo -e "${CYAN}║     source ~/.zshrc                              ║${NC}"
+echo -e "${CYAN}║     source ${PROFILE_FILE}"
 echo -e "${CYAN}║                                                   ║${NC}"
 echo -e "${CYAN}║  3. Bắt đầu dùng:                                ║${NC}"
 echo -e "${CYAN}║     chat                                         ║${NC}"
