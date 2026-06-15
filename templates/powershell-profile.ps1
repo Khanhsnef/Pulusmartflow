@@ -23,7 +23,7 @@ function Get-IntentModel {
         "DEEP_THINK"  { return @("cc/claude-opus-4-8", "🧠 OPUS 4.8 (AI-routed)") }
         "CODE_FORMAT" { return @("cc/claude-sonnet-4-6", "💻 SONNET (AI-routed)") }
         "LANGUAGE"    { return @("gc/gemini-3-pro-preview", "⚡ GEMINI PRO (AI-routed)") }
-        "ENGLISH"     { return @("oc/gpt-5-5", "🌐 GPT-5.5 (AI-routed)") }
+        "ENGLISH"     { return @("cx/gpt-5.5", "🌐 GPT-5.5 (AI-routed)") }
         "QUICK"       { return @("oc/deepseek-v4-flash-free", "💨 DEEPSEEK (AI-routed)") }
         default       { return $null }
     }
@@ -38,7 +38,7 @@ function Get-RegexRoute {
         return @("cc/claude-opus-4-8", "🧠 OPUS 4.8 (regex)")
     }
     elseif ($lower -match '(english|tiếng anh|proposal|hq|headquarter|leadership|international|global|board|presentation|investor|deck|pitch|official|formal|write in english|draft in english)') {
-        return @("oc/gpt-5-5", "🌐 GPT-5.5 (regex)")
+        return @("cx/gpt-5.5", "🌐 GPT-5.5 (regex)")
     }
     elseif ($lower -match '(dịch thuật|dịch|thông báo|tài xế|zalo|chính tả|ngữ pháp|viết lại|caption|kịch bản|nội dung|tóm tắt|đọc file|log|competitive|cạnh tranh|grab|be |xanhsm)') {
         return @("gc/gemini-3-pro-preview", "⚡ GEMINI PRO (regex)")
@@ -105,7 +105,7 @@ function Get-DetectModel {
         return @("cc/claude-opus-4-8", "🧠 OPUS 4.8 (regex)", "TEXT")
     }
     elseif ($lower -match '(english|tiếng anh|proposal|hq|leadership|global|board|investor|international|official|formal)') {
-        return @("oc/gpt-5-5", "🌐 GPT-5.5 (regex)", "TEXT")
+        return @("cx/gpt-5.5", "🌐 GPT-5.5 (regex)", "TEXT")
     }
     elseif ($lower -match '(thông báo|zalo|tài xế|viết lại|caption|kịch bản|nội dung|tóm tắt|dịch|cạnh tranh|grab|be |xanhsm|competitive)') {
         return @("gc/gemini-3-pro-preview", "⚡ GEMINI PRO (regex)", "TEXT")
@@ -116,7 +116,8 @@ function Get-DetectModel {
     elseif ($lower -match '(docx|pdf|xuất|tạo.*file|định dạng|chuyển đổi|convert|export|ghi|lưu file)') {
         return @("cc/claude-sonnet-4-6", "💻 SONNET (regex)", "TOOL")
     }
-    elseif ($lower -match '(sql|query|html|code|dashboard|báo cáo|lark|markdown|lập trình|script|file)') {
+    elseif ($lower -match '(sql|query|html|code|dashboard|báo cáo|lark|markdown|lập trình|script)') {
+        # Loại bỏ regex "file" quá rộng để tránh false-positive
         return @("cc/claude-sonnet-4-6", "💻 SONNET (regex)", "TEXT")
     }
     else {
@@ -147,9 +148,24 @@ function Get-DetectModel {
 
 # --- Smart Chat REPL ---
 function Invoke-SmartChat {
+    param(
+        [Parameter(Position=0)]
+        [string]$mode_arg
+    )
+
+    $danger_mode = $false
+    if ($mode_arg -eq "!" -or $mode_arg -eq "-danger") {
+        $danger_mode = $true
+    }
+
     Write-Host ""
     Write-Host "╔══════════════════════════════════════════╗" -ForegroundColor Green
     Write-Host "║  🤖 Smart Chat — tự động routing model  ║" -ForegroundColor Green
+    if ($danger_mode) {
+        Write-Host "║  ⚠️ DANGER MODE: Tự động xác thực quyền  ║" -ForegroundColor Green
+    } else {
+        Write-Host "║  🔒 SAFE MODE: Yêu cầu xác thực quyền    ║" -ForegroundColor Green
+    }
     Write-Host "║  Gõ 'exit' hoặc Ctrl+C để thoát         ║" -ForegroundColor Green
     Write-Host "╚══════════════════════════════════════════╝" -ForegroundColor Green
     Write-Host ""
@@ -174,12 +190,22 @@ function Invoke-SmartChat {
         Write-Host "`n$label`n" -ForegroundColor Yellow
 
         if ($mode -eq "TOOL") {
-            Write-Host "🔧 Tool Mode — gõ /exit sau khi xong để quay lại đây" -ForegroundColor DarkGray
-            if ($first_msg) {
-                claude --model $model $inputVal
-                $first_msg = $false
+            if ($danger_mode) {
+                Write-Host "🔧 Tool Mode (DANGER) — gõ /exit sau khi xong" -ForegroundColor DarkGray
+                if ($first_msg) {
+                    claude --model $model --dangerously-skip-permissions $inputVal
+                    $first_msg = $false
+                } else {
+                    claude --model $model --dangerously-skip-permissions --continue $inputVal
+                }
             } else {
-                claude --model $model --continue $inputVal
+                Write-Host "🔧 Tool Mode (SAFE) — gõ /exit sau khi xong" -ForegroundColor DarkGray
+                if ($first_msg) {
+                    claude --model $model $inputVal
+                    $first_msg = $false
+                } else {
+                    claude --model $model --continue $inputVal
+                }
             }
         } else {
             if ($first_msg) {

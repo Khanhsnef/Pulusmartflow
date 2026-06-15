@@ -41,8 +41,8 @@ echo -e "${GREEN}   Node.js & npm OK${NC}"
 if ! command -v claude &>/dev/null; then
     echo -e "${YELLOW}   Đang cài đặt Claude Code CLI (@anthropic-ai/claude-code)...${NC}"
     npm install -g @anthropic-ai/claude-code || {
-        echo -e "${YELLOW}   ⚠️ Không thể cài global thông thường, đang thử với sudo...${NC}"
-        sudo npm install -g @anthropic-ai/claude-code
+        echo -e "${RED}❌ Không thể cài đặt global. Vui lòng xử lý lỗi phân quyền npm (EACCES) bằng cách tham khảo: https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally hoặc tự chạy cài đặt thủ công.${NC}"
+        exit 1
     }
 fi
 echo -e "${GREEN}   Claude Code CLI OK${NC}"
@@ -51,8 +51,8 @@ echo -e "${GREEN}   Claude Code CLI OK${NC}"
 if ! command -v 9router &>/dev/null; then
     echo -e "${YELLOW}   Đang cài đặt 9Router...${NC}"
     npm install -g 9router || {
-        echo -e "${YELLOW}   ⚠️ Không thể cài global thông thường, đang thử với sudo...${NC}"
-        sudo npm install -g 9router
+        echo -e "${RED}❌ Không thể cài đặt global. Vui lòng xử lý lỗi phân quyền npm (EACCES) và cài đặt thủ công 9Router.${NC}"
+        exit 1
     }
 fi
 echo -e "${GREEN}   9Router OK${NC}"
@@ -103,9 +103,14 @@ cp "$SCRIPT_DIR/templates/AGENTS.md" "$WORKSPACE/AGENTS.md" 2>/dev/null || true
 echo -e "${GREEN}✅ Workspace tạo tại: ${WORKSPACE}${NC}"
 
 # ─── Bước 5: Cấu hình tối ưu Token & MCP ───
-echo -e "${YELLOW}[5/6] Tối ưu hóa cấu hình Claude Code (Token limits, Prompt cache, MCPs)...${NC}"
-python3 "$SCRIPT_DIR/scripts/optimize_claude_config.py"
-echo -e "${GREEN}✅ Claude Code Config OK${NC}"
+echo -e "${YELLOW}[5/6] Bạn có muốn tối ưu hóa cấu hình Claude Code không? (Sử dụng cờ tengu_* để giới hạn token/cache) (y/n):${NC}"
+read -r opt_choice
+if [[ "$opt_choice" =~ ^[Yy]$ ]]; then
+    python3 "$SCRIPT_DIR/scripts/optimize_claude_config.py"
+    echo -e "${GREEN}✅ Đã hoàn tất tối ưu hóa cấu hình Claude Code!${NC}"
+else
+    echo -e "${GREEN}   Bỏ qua bước tối ưu hóa cấu hình Claude Code (Giữ cấu hình mặc định).${NC}"
+fi
 
 # ─── Bước 6: Hướng dẫn tiếp theo ───
 echo ""

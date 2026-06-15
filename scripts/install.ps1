@@ -122,9 +122,13 @@ Copy-Item -Path "$scriptDir\templates\AGENTS.md" -Destination "$workspace\AGENTS
 Write-Host "✅ Workspace tạo tại: $workspace" -ForegroundColor Green
 
 # ─── Bước 5: Cấu hình tối ưu Token & MCP ───
-Write-Host "[5/6] Tối ưu hóa cấu hình Claude Code (Token limits, Prompt cache, MCPs)..." -ForegroundColor Yellow
-& python "$scriptDir\scripts\optimize_claude_config.py"
-Write-Host "✅ Claude Code Config OK" -ForegroundColor Green
+$optChoice = Read-Host "[5/6] Bạn có muốn tối ưu hóa cấu hình Claude Code không? (Sử dụng cờ tengu_* để giới hạn token/cache) (y/n)"
+if ($optChoice -match '^[Yy]$') {
+    & python "$scriptDir\scripts\optimize_claude_config.py"
+    Write-Host "✅ Đã hoàn tất tối ưu hóa cấu hình Claude Code!" -ForegroundColor Green
+} else {
+    Write-Host "   Bỏ qua bước tối ưu hóa cấu hình Claude Code (Giữ cấu hình mặc định)." -ForegroundColor Green
+}
 
 # ─── Bước 6: Hướng dẫn tiếp theo ───
 Write-Host ""

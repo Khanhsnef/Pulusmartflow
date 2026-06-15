@@ -19,7 +19,7 @@ _intent_to_model() {
         DEEP_THINK)  echo "cc/claude-opus-4-8|🧠 OPUS 4.8 (AI-routed)" ;;
         CODE_FORMAT) echo "cc/claude-sonnet-4-6|💻 SONNET (AI-routed)" ;;
         LANGUAGE)    echo "gc/gemini-3-pro-preview|⚡ GEMINI PRO (AI-routed)" ;;
-        ENGLISH)     echo "oc/gpt-5-5|🌐 GPT-5.5 (AI-routed)" ;;
+        ENGLISH)     echo "cx/gpt-5.5|🌐 GPT-5.5 (AI-routed)" ;;
         QUICK)       echo "oc/deepseek-v4-flash-free|💨 DEEPSEEK (AI-routed)" ;;
         *)           echo "" ;;
     esac
@@ -31,7 +31,7 @@ _regex_route() {
     if [[ "$lower" =~ (phân tích|chiến lược|kế hoạch|logic|kiến trúc|hệ thống|quy hoạch|tư duy|chiều sâu|đánh đổi|trade-off|p\&l|sla|nguyên nhân gốc rễ|root cause|insight|quyết định|decision|rủi ro|fraud|cung cầu|supply|demand|tâm lý|hành vi|okr|kpi|benchmark|driver journey|retention|churn|ltv) ]]; then
         echo "cc/claude-opus-4-8|🧠 OPUS 4.8 (regex)"
     elif [[ "$lower" =~ (english|tiếng anh|proposal|hq|headquarter|leadership|international|global|board|presentation|investor|deck|pitch|official|formal|write in english|draft in english) ]]; then
-        echo "oc/gpt-5-5|🌐 GPT-5.5 (regex)"
+        echo "cx/gpt-5.5|🌐 GPT-5.5 (regex)"
     elif [[ "$lower" =~ (dịch thuật|dịch|thông báo|tài xế|zalo|chính tả|ngữ pháp|viết lại|caption|kịch bản|nội dung|tóm tắt|đọc file|log|competitive|cạnh tranh|grab|be |xanhsm) ]]; then
         echo "gc/gemini-3-pro-preview|⚡ GEMINI PRO (regex)"
     elif [[ "$lower" =~ (hỏi nhanh|giải thích|tính toán|định nghĩa|là gì|như thế nào|thế nào|regex|quick|nhanh) ]]; then
@@ -90,14 +90,15 @@ _detect_model() {
     if [[ "$lower" =~ (phân tích|chiến lược|kế hoạch|insight|quyết định|rủi ro|fraud|cung cầu|supply|demand|tâm lý|hành vi|sla|root cause|nguyên nhân|okr|kpi|benchmark|driver journey|retention|churn|ltv) ]]; then
         echo "cc/claude-opus-4-8|🧠 OPUS 4.8 (regex)|TEXT"
     elif [[ "$lower" =~ (english|tiếng anh|proposal|hq|leadership|global|board|investor|international|official|formal) ]]; then
-        echo "oc/gpt-5-5|🌐 GPT-5.5 (regex)|TEXT"
+        echo "cx/gpt-5.5|🌐 GPT-5.5 (regex)|TEXT"
     elif [[ "$lower" =~ (thông báo|zalo|tài xế|viết lại|caption|kịch bản|nội dung|tóm tắt|dịch|cạnh tranh|grab|be |xanhsm|competitive) ]]; then
         echo "gc/gemini-3-pro-preview|⚡ GEMINI PRO (regex)|TEXT"
     elif [[ "$lower" =~ (hỏi nhanh|định nghĩa|là gì|nhanh|quick|regex|tính toán|giải thích) ]]; then
         echo "oc/deepseek-v4-flash-free|💨 DEEPSEEK (regex)|TEXT"
     elif [[ "$lower" =~ (docx|pdf|xuất|tạo.*file|định dạng|chuyển đổi|convert|export|ghi|lưu file) ]]; then
         echo "cc/claude-sonnet-4-6|💻 SONNET (regex)|TOOL"
-    elif [[ "$lower" =~ (sql|query|html|code|dashboard|báo cáo|lark|markdown|lập trình|script|file) ]]; then
+    elif [[ "$lower" =~ (sql|query|html|code|dashboard|báo cáo|lark|markdown|lập trình|script) ]]; then
+        # Loại bỏ regex "file" quá rộng để tránh false-positive
         echo "cc/claude-sonnet-4-6|💻 SONNET (regex)|TEXT"
     else
         # 2. Không khớp từ khóa đặc trưng -> Gọi AI Classifier để phân loại chính xác
@@ -112,7 +113,7 @@ _detect_model() {
                 fi
                 return ;;
             LANGUAGE)    echo "gc/gemini-3-pro-preview|⚡ GEMINI PRO (AI)|TEXT"; return ;;
-            ENGLISH)     echo "oc/gpt-5-5|🌐 GPT-5.5 (AI)|TEXT"; return ;;
+            ENGLISH)     echo "cx/gpt-5.5|🌐 GPT-5.5 (AI)|TEXT"; return ;;
             QUICK)       echo "oc/deepseek-v4-flash-free|💨 DEEPSEEK (AI)|TEXT"; return ;;
         esac
         
@@ -124,9 +125,20 @@ _detect_model() {
 # --- Smart Chat REPL: gõ "chat" để vào ---
 smart_chat() {
     local first_msg=true
+    local danger_mode=false
+    
+    if [[ "$1" == "!" ]]; then
+        danger_mode=true
+    fi
+
     echo ""
     echo "╔══════════════════════════════════════════╗"
     echo "║  🤖 Smart Chat — tự động routing model  ║"
+    if [[ "$danger_mode" == true ]]; then
+        echo "║  ⚠️ DANGER MODE: Tự động xác thực quyền  ║"
+    else
+        echo "║  🔒 SAFE MODE: Yêu cầu xác thực quyền    ║"
+    fi
     echo "║  Gõ 'exit' hoặc Ctrl+C để thoát         ║"
     echo "╚══════════════════════════════════════════╝"
     echo ""
@@ -147,12 +159,22 @@ smart_chat() {
         echo -e "\n$(tput setaf 3)$label$(tput sgr0)\n"
 
         if [[ "$mode" == "TOOL" ]]; then
-            echo -e "\033[2m🔧 Đang bật giao diện Công Cụ (Hãy gõ /exit sau khi xong để quay lại đây)\033[0m"
-            if [[ "$first_msg" == true ]]; then
-                claude --model "$model" "$input"
-                first_msg=false
+            if [[ "$danger_mode" == true ]]; then
+                echo -e "\033[2m🔧 Đang bật giao diện Công Cụ (TỰ ĐỘNG CẤP QUYỀN - Hãy gõ /exit sau khi xong)\033[0m"
+                if [[ "$first_msg" == true ]]; then
+                    claude --model "$model" --dangerously-skip-permissions "$input"
+                    first_msg=false
+                else
+                    claude --model "$model" --dangerously-skip-permissions --continue "$input"
+                fi
             else
-                claude --model "$model" --continue "$input"
+                echo -e "\033[2m🔧 Đang bật giao diện Công Cụ (An toàn - Hãy gõ /exit sau khi xong)\033[0m"
+                if [[ "$first_msg" == true ]]; then
+                    claude --model "$model" "$input"
+                    first_msg=false
+                else
+                    claude --model "$model" --continue "$input"
+                fi
             fi
         else
             if [[ "$first_msg" == true ]]; then
@@ -167,6 +189,7 @@ smart_chat() {
 }
 alias chat="smart_chat"
 alias start="smart_chat"
+alias "chat!"="smart_chat !"
 
 # --- Command Not Found → Auto-route to AI ---
 export _PULU_CNF_DEPTH=0

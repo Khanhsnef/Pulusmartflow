@@ -217,10 +217,15 @@ Hệ thống có **10 lớp tối ưu** để giảm thiểu chi phí:
 10. **Two-Stage Classifier** — Chỉ dùng model lớn khi thực sự cần
 
 ### ⚙️ Cách Áp Dụng Tự Động
-Khi bạn chạy script cài đặt `./scripts/install.sh`, hệ thống sẽ tự động gọi Python script để trộn (merge) các cấu hình tối ưu này từ `templates/claude.json` vào cấu hình Claude Code của bạn tại `~/.claude.json`.
+Khi bạn chạy script cài đặt `./scripts/install.sh`, hệ thống sẽ hỏi bạn trước khi trộn (merge) các cấu hình tối ưu này từ `templates/claude.json` vào cấu hình Claude Code của bạn tại `~/.claude.json`.
 
-### ✍️ Cấu Hình Thủ Công
-Nếu muốn cấu hình thủ công, bạn có thể tham khảo file mẫu [templates/claude.json](file:///Users/ts-1148/Desktop/Pulusmartflow/templates/claude.json) và sao chép các khóa tương ứng vào `~/.claude.json` của mình.
+> [!WARNING]
+> Các cấu hình tối ưu sử dụng các khóa bắt đầu bằng `tengu_*` (ví dụ: `tengu_swann_brevity`, `tengu_pewter_kestrel`). Đây là các tham số nội bộ chưa công bố chính thức của Claude Code dùng để cấu hình giới hạn token và tần suất nén ngữ cảnh. Việc áp dụng các khóa này có thể không tương thích hoàn toàn nếu phiên bản Claude Code của bạn thay đổi trong tương lai. Bạn có thể bỏ qua bước này khi cài đặt nếu muốn giữ cấu hình mặc định.
+
+### ⚠️ Bảo mật & Quyền hạn (Danger Mode)
+Để tránh rủi ro mã độc tự động chạy lệnh hoặc xóa tệp tin hệ thống ngoài ý muốn, PuluSmartFlow mặc định tắt chế độ bỏ qua phân quyền.
+*   **Chế độ An toàn (Mặc định - `chat`)**: Mọi hành động đọc/ghi file hoặc thực thi lệnh shell ngoài các vùng cho phép đều sẽ yêu cầu bạn xác nhận thủ công (nhấn `y/n`).
+*   **Chế độ Cấp quyền nhanh (Opt-in - `chat!`)**: Nếu bạn hoàn toàn tin tưởng AI và muốn chạy tự động không cần hỏi, hãy khởi động bằng lệnh `chat!` thay vì `chat`.
 
 ---
 
