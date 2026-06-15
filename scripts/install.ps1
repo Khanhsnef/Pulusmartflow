@@ -137,9 +137,9 @@ Write-Host "║  ✅ Cài đặt hoàn tất!                            ║" -F
 Write-Host "╠═══════════════════════════════════════════════════╣" -ForegroundColor Cyan
 Write-Host "║  📌 Bước cuối cần làm thủ công:                  ║" -ForegroundColor Cyan
 Write-Host "║                                                   ║" -ForegroundColor Cyan
-Write-Host "║  1. Chỉnh API Key trong File Profile của bạn:     ║" -ForegroundColor Cyan
-Write-Host "║     Gõ lệnh: notepad `$PROFILE                    ║" -ForegroundColor Cyan
-Write-Host "║     Đặt biến: `$env:ANTHROPIC_API_KEY = `"key`"     ║" -ForegroundColor Cyan
+Write-Host "║  1. Chỉnh API Key trong file bảo mật env:         ║" -ForegroundColor Cyan
+Write-Host "║     Gõ lệnh: notepad `$HOME\.config\pulu\env      ║" -ForegroundColor Cyan
+Write-Host "║     Đặt biến: export ANTHROPIC_API_KEY=key        ║" -ForegroundColor Cyan
 Write-Host "║                                                   ║" -ForegroundColor Cyan
 Write-Host "║  2. Reload shell:                                 ║" -ForegroundColor Cyan
 Write-Host "║     Tắt đi bật lại Terminal hoặc chạy:            ║" -ForegroundColor Cyan
