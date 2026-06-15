@@ -66,7 +66,7 @@ def classify(prompt: str) -> str:
     try:
         import httpx
 
-        base_url = os.environ.get("ANTHROPIC_BASE_URL", "http://localhost:20128/v1").rstrip("/")
+        base_url = os.environ.get("ANTHROPIC_BASE_URL", "http://127.0.0.1:8787/v1").rstrip("/")
         api_key  = os.environ.get("ANTHROPIC_API_KEY", "sk-local")
 
         # Thử lần lượt: Haiku (nhanh/rẻ) → Gemini Flash → DeepSeek (với nhiều token hơn)
