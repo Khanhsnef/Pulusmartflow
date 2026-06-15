@@ -16,17 +16,47 @@ echo "║  🤖 PuluSmartFlow — Installer v1.0   ║"
 echo "╚═══════════════════════════════════════╝"
 echo -e "${NC}"
 
-# ─── Bước 1: Kiểm tra Python và httpx ───
-echo -e "${YELLOW}[1/6] Kiểm tra Python...${NC}"
+# ─── Bước 1: Kiểm tra Python, Node.js, Claude Code và 9Router ───
+echo -e "${YELLOW}[1/6] Kiểm tra các công cụ nền tảng...${NC}"
+
+# Python & httpx
 if ! command -v python3 &>/dev/null; then
-    echo -e "${RED}❌ Python3 chưa cài. Cài tại: https://www.python.org${NC}"
+    echo -e "${RED}❌ Python3 chưa cài. Vui lòng cài đặt tại: https://www.python.org${NC}"
     exit 1
 fi
 python3 -c "import httpx" 2>/dev/null || {
-    echo -e "${YELLOW}   Đang cài httpx...${NC}"
+    echo -e "${YELLOW}   Đang cài thư viện Python httpx...${NC}"
     pip3 install httpx -q
 }
-echo -e "${GREEN}✅ Python OK${NC}"
+echo -e "${GREEN}   Python & httpx OK${NC}"
+
+# Node.js & npm
+if ! command -v npm &>/dev/null; then
+    echo -e "${RED}❌ Node.js & npm chưa cài. Vui lòng cài đặt tại: https://nodejs.org${NC}"
+    exit 1
+fi
+echo -e "${GREEN}   Node.js & npm OK${NC}"
+
+# Claude Code CLI
+if ! command -v claude &>/dev/null; then
+    echo -e "${YELLOW}   Đang cài đặt Claude Code CLI (@anthropic-ai/claude-code)...${NC}"
+    npm install -g @anthropic-ai/claude-code || {
+        echo -e "${YELLOW}   ⚠️ Không thể cài global thông thường, đang thử với sudo...${NC}"
+        sudo npm install -g @anthropic-ai/claude-code
+    }
+fi
+echo -e "${GREEN}   Claude Code CLI OK${NC}"
+
+# 9Router
+if ! command -v 9router &>/dev/null; then
+    echo -e "${YELLOW}   Đang cài đặt 9Router...${NC}"
+    npm install -g 9router || {
+        echo -e "${YELLOW}   ⚠️ Không thể cài global thông thường, đang thử với sudo...${NC}"
+        sudo npm install -g 9router
+    }
+fi
+echo -e "${GREEN}   9Router OK${NC}"
+echo -e "${GREEN}✅ Các công cụ nền tảng đã sẵn sàng!${NC}"
 
 # ─── Bước 2: Copy ai-classify.py ───
 echo -e "${YELLOW}[2/6] Cài AI Classifier...${NC}"
@@ -41,8 +71,19 @@ echo -e "${YELLOW}[3/6] Cài Smart Router vào ~/.zshrc...${NC}"
 if grep -q "SMART AI ROUTER" ~/.zshrc 2>/dev/null; then
     echo -e "${YELLOW}   ⚠️  Smart Router đã tồn tại. Bỏ qua để tránh trùng lặp.${NC}"
 else
-    cat "$SCRIPT_DIR/zshrc-snippet.sh" >> ~/.zshrc
-    echo -e "${GREEN}✅ Smart Router đã thêm vào ~/.zshrc${NC}"
+    echo -e "${CYAN}🔑 Nhập API Key 9Router của bạn (nhấn Enter để bỏ qua và tự điền sau):${NC}"
+    read -r user_key
+    
+    if [ -n "$user_key" ]; then
+        temp_snippet="/tmp/zshrc-snippet-temp.sh"
+        sed "s/your-9router-api-key-here/$user_key/g" "$SCRIPT_DIR/zshrc-snippet.sh" > "$temp_snippet"
+        cat "$temp_snippet" >> ~/.zshrc
+        rm -f "$temp_snippet"
+        echo -e "${GREEN}✅ Smart Router (đã cấu hình API Key) đã thêm vào ~/.zshrc${NC}"
+    else
+        cat "$SCRIPT_DIR/zshrc-snippet.sh" >> ~/.zshrc
+        echo -e "${GREEN}✅ Smart Router (chưa cấu hình API Key) đã thêm vào ~/.zshrc${NC}"
+    fi
 fi
 
 # ─── Bước 4: Tạo cấu trúc workspace ───
