@@ -165,4 +165,8 @@ command_not_found_handler() {
     claude --model "$model" --continue -p "$input"
     return 0
 }
+# Fallback cho Bash shell của một số dòng máy Linux/Ubuntu
+command_not_found_handle() {
+    command_not_found_handler "$@"
+}
 # ============================================
